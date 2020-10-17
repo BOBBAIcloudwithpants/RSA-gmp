@@ -9,7 +9,7 @@ INCLUDE := -I./$(INC_DIR)
 GMP_DIR := gmp-build
 LIB := -L./lib -lgmp
 
-$(BIN_DIR)/main: $(BUILD_DIR)/main.o $(BUILD_DIR)/Int.o $(BUILD_DIR)/Rsa.o $(BUILD_DIR)/OctetString.o
+$(BIN_DIR)/main: $(BUILD_DIR)/main.o $(BUILD_DIR)/Int.o $(BUILD_DIR)/Rsa.o $(BUILD_DIR)/OctetString.o $(BUILD_DIR)/KeyProducing.o
 	@mkdir -p $(BIN_DIR)
 	$(CC) $(FLAGS) $(INCLUDE) $(LIB) $^ -o $@
 

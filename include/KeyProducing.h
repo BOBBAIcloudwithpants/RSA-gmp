@@ -5,50 +5,18 @@
 #include "Int.h"
 
 // 生成一个n位(2进制)的随机数
-void RandomNumber(mpz_t c, int n)
-{
-  gmp_randstate_t state;
-  gmp_randinit_default(state);
-
-  mp_bitcnt_t v;
-  v = n;
-  mpz_rrandomb(c, state, v);
-}
+void RandomNumber(mpz_t c, int n);
 
 // 检查p, q的距离是否符合要求
-int PQCheck(mpz_t p, mpz_t q, int k)
-{
-  mpz_t c;
-  mpz_init(c);
+int PQCheck(mpz_t p, mpz_t q, int k);
 
-  // c = p-q
-  Minus(c, p, q);
+// 是否是k bit整数
+int IsKbit(mpz_t n, int k);
 
-  mpz_abs(c, c);
+// 求 Phi(n) = (p-1)(q-1)
+void PhiN(mpz_t phi, mpz_t p, mpz_t q);
 
-  mpz_t t1;
-  mpz_init(t1);
-  Init_val(t1, k);
-  mpz_t t2;
-  mpz_init(t2);
-  Init_val(t2, k);
+// 产生公私钥，(e, n) 为公钥，(d, n) 为私钥, k为产生模数的位数
+void ProduceKey(int k, mpz_t n, mpz_t e, mpz_t d);
 
-  Div_val(t1, t1, 2);
-  // t2 = k/3
-  Div_val(t2, t2, 3);
-
-  // t1 = k/2-100
-  Div_val(t1, t1, 100);
-  if (Compare_mpz(c, t1) <= 0)
-  {
-    return 0;
-  }
-
-  if (Compare_mpz(c, t2) <= 0)
-  {
-    return 0;
-  }
-
-  return 1;
-}
 #endif

@@ -125,5 +125,90 @@ void Encryption(mpz_t n, mpz_t e, OctetString *M, OctetString *C)
 
   I2OSP(c, k, C);
   Octet_print(C);
+
+  mpz_clear(m);
+  mpz_clear(c);
+  Octet_free(EM);
 };
 
+int isValidEM(OctetString *EM)
+{
+  int ps_pos = EM->pos - 1;
+  while (ps_pos > 1 && EM->arr[ps_pos] != 0)
+  {
+    ps_pos--;
+  }
+
+  if (EM->arr[0] != 0 || EM->arr[1] != 2 || ps_pos <= 1 || ps_pos - 2 < 8)
+  {
+    return 0;
+  }
+  else
+  {
+    return ps_pos;
+  }
+}
+
+void EME_decoding(OctetString *EM, OctetString *M, int ps_pos)
+{
+  int ps_len = ps_pos - 2;
+  int mlen = EM->len - ps_len - 2;
+  M = Octet_init(mlen);
+
+  for (int i = 0; i < mlen; i++)
+  {
+    Octet_appendVal(M, EM->arr[ps_pos + i + 1]);
+  }
+}
+
+void Decryption(mpz_t n, mpz_t d, OctetString *C, OctetString *M)
+{
+  int k = Octet_ValSize(n);
+
+  if (C->len != k)
+  {
+    printf("decryption error");
+    return;
+  }
+
+  mpz_t c;
+  mpz_init(c);
+  OS2IP(C, c);
+
+  mpz_t n_1;
+  mpz_init(n_1);
+  Minus_val(n_1, n, 1);
+
+  if (Compare_val(c, 0) <= 0 || Compare_mpz(c, n_1) >= 0)
+  {
+    mpz_clear(n_1);
+    mpz_clear(c);
+    printf("ciphertext representative out of range\n");
+    return;
+  }
+
+  mpz_t m;
+  mpz_init(m);
+
+  RSADP(n, d, c, m);
+
+  OctetString *EM = Octet_init(k);
+  I2OSP(m, k, EM);
+
+  int ps_pos = isValidEM(EM);
+  if (!ps_pos)
+  {
+    mpz_clear(c);
+    mpz_clear(m);
+    mpz_clear(n_1);
+    Octet_free(EM);
+    printf("message too long\n");
+    return;
+  }
+  EME_decoding(EM, M, ps_pos);
+
+  mpz_clear(c);
+  mpz_clear(m);
+  mpz_clear(n_1);
+  Octet_free(EM);
+}
