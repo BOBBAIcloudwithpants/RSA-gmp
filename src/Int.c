@@ -75,3 +75,8 @@ void Minus_val(mpz_t c, mpz_t a, long long b)
 {
   mpz_sub_ui(c, a, b);
 };
+
+void Product_val(mpz_t c, mpz_t a, long long b)
+{
+  mpz_mul_ui(c, a, b);
+};

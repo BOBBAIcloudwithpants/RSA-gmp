@@ -4,6 +4,7 @@
 #include "Int.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 /*  Array 结构体的定义以及相关的方法  */
 typedef struct
@@ -37,9 +38,15 @@ int Octet_getOctetlengthForInteger(mpz_t num);
 // Generate PS
 OctetString *Octet_generatePS(int length);
 
+OctetString *Octet_ConvertTextToOctets(char *text);
+
+char *Octet_ConvertOctetsToText(OctetString *octets);
+
 // 释放 Octet 所占的空间
 void Octet_free(OctetString *os);
 
 int Octet_ValSize(mpz_t val);
+
+void Octet_ConvertKeyToInt(const char *key, mpz_t m);
 
 #endif

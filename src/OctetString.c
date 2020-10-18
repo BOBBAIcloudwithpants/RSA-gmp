@@ -121,3 +121,62 @@ int Octet_ValSize(mpz_t val)
   mpz_clear(x);
   return ret;
 }
+
+int Octet_ConvertCharToInt(char a)
+{
+
+  // 0到9
+  if (a < 65)
+  {
+    return a - '0';
+  }
+  else if (a >= 65 && a <= 90)
+  {
+    return 10 + a - 'A';
+  }
+  else
+  {
+    return 10 + a - 'a';
+  }
+}
+
+int Octet_ConvertByteToInt(char h, char l)
+{
+  return Octet_ConvertCharToInt(h) * 16 + Octet_ConvertCharToInt(l);
+}
+
+void Octet_ConvertKeyToInt(const char *key, mpz_t a)
+{
+  int len = strlen(key);
+
+  int i = 0;
+  while (i < len)
+  {
+    Product_val(a, a, 256);
+    Add_val(a, a, Octet_ConvertByteToInt(key[i], key[i + 1]));
+    i += 3;
+  }
+};
+
+OctetString *Octet_ConvertTextToOctets(char *text)
+{
+  long long len = strlen(text);
+  OctetString *ret = Octet_init(len);
+  for (int i = 0; i < len; i++)
+  {
+    Octet_appendVal(ret, text[i]);
+  }
+  return ret;
+}
+
+char *Octet_ConvertOctetsToText(OctetString *octets)
+{
+  char *ret = (char *)malloc(sizeof(char) * (octets->len + 1));
+  int i = 0;
+  for (i = 0; i < octets->len; i++)
+  {
+    ret[i] = octets->arr[i];
+  }
+  ret[i] = '\0';
+  return ret;
+}

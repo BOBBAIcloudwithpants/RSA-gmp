@@ -13,11 +13,14 @@ void Div(mpz_t c, mpz_t a, mpz_t b);
 
 void Mod(mpz_t c, mpz_t a, mpz_t b);
 
+// c = a^b mod n
 void PowerMod(mpz_t c, mpz_t a, mpz_t b, mpz_t n);
 
 void Init_val(mpz_t a, long long num);
 
 void Init_str(mpz_t a, const char *str);
+
+void Product_val(mpz_t a, mpz_t b, long long c);
 
 void Add_val(mpz_t c, mpz_t a, long long b);
 

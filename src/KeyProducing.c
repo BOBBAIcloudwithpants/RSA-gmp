@@ -48,25 +48,8 @@ int PQCheck(mpz_t p, mpz_t q, int k)
 
 int IsKbit(mpz_t n, int k)
 {
-  mpz_t base;
-  mpz_init(base);
-  Init_val(base, 2);
-
-  // 2^(k-1)
-  mpz_t low;
-  mpz_init(low);
-  Power(low, base, k - 1);
-
-  // 2^k - 1
-  mpz_t high;
-  mpz_init(high);
-  Power(high, base, k);
-  Minus_val(high, high, 1);
-
-  if (Compare_mpz(n, low) >= 0 && Compare_mpz(n, high) <= 0)
-  {
+  if (mpz_sizeinbase(n, 2) == k)
     return 1;
-  }
   return 0;
 }
 
@@ -84,9 +67,10 @@ void PhiN(mpz_t phi, mpz_t p, mpz_t q)
 
 void ProduceKey(int k, mpz_t n, mpz_t e, mpz_t d)
 {
-
   gmp_randinit_default(state);
   gmp_randseed_ui(state, time(NULL));
+  mpz_t phiN;
+  mpz_init(phiN);
   while (1)
   {
     mpz_t temp_p;
@@ -98,10 +82,11 @@ void ProduceKey(int k, mpz_t n, mpz_t e, mpz_t d)
 
     RandomNumber(temp_p, k / 2);
     RandomNumber(temp_q, k / 2);
-    PhiN(temp_n, temp_p, temp_q);
+    Product(temp_n, temp_p, temp_q);
 
     if (PQCheck(temp_p, temp_q, k) && IsKbit(temp_n, k))
     {
+      PhiN(phiN, temp_p, temp_q);
       mpz_set(n, temp_n);
       mpz_clear(temp_n);
       mpz_clear(temp_p);
@@ -118,5 +103,5 @@ void ProduceKey(int k, mpz_t n, mpz_t e, mpz_t d)
   mpz_set_ui(e, 65537);
 
   // 用逆元求d
-  mpz_invert(d, e, n);
+  mpz_invert(d, e, phiN);
 }
