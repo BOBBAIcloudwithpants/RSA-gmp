@@ -38,15 +38,19 @@ int Octet_getOctetlengthForInteger(mpz_t num);
 // Generate PS
 OctetString *Octet_generatePS(int length);
 
+// 将字符转换成 Octets 字节流
 OctetString *Octet_ConvertTextToOctets(char *text);
 
+// 将Octets字节流转换为字符串
 char *Octet_ConvertOctetsToText(OctetString *octets);
 
 // 释放 Octet 所占的空间
 void Octet_free(OctetString *os);
 
+// 求一个整数在字节流下的大小
 int Octet_ValSize(mpz_t val);
 
+// 将用16进制表示的密钥转换为大整数
 void Octet_ConvertKeyToInt(const char *key, mpz_t m);
 
 #endif
