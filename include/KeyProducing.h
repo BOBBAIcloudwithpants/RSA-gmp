@@ -3,6 +3,7 @@
 
 #include "gmp.h"
 #include "Int.h"
+#include <stdlib.h>
 
 // 生成一个n位(2进制)的随机数
 void RandomNumber(mpz_t c, int n);

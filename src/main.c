@@ -4,21 +4,25 @@
 #include "KeyProducing.h"
 int main()
 {
-  mpz_t a, b, c, n;
+  mpz_t a, d, e, n, c;
 
   mpz_init(a);
-  mpz_init(b);
-  mpz_init(c);
+  mpz_init(d);
+  mpz_init(e);
   mpz_init(n);
+  mpz_init(c);
 
-  // Init_str(a, "13513246463452342");
-  // Init_str(b, "13241354565556331239847813513487913491341354135");
-  // Init_val(c, 65536);
-  // OctetString *str = Octet_init(3);
-  // I2OSP(c, 3, str);
-  // OctetString *C;
-  // Encryption(b, a, str, C);
+  ProduceKey(1024, n, e, d);
+  Init_val(c, 67000);
 
-  RandomNumber(a, 1024);
-  gmp_printf("%Zd", a);
+  OctetString *str = Octet_init(3);
+  I2OSP(c, 3, str);
+  OctetString *C;
+  OctetString *M;
+  Encryption(n, e, str, C);
+  Decryption(n, d, C, M);
+
+  gmp_printf("n: %Zd\n", n);
+  gmp_printf("e: %Zd\n", e);
+  gmp_printf("d: %Zd\n", d);
 }

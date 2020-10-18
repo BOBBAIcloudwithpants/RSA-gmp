@@ -1,14 +1,12 @@
 #include "KeyProducing.h"
 
+gmp_randstate_t state;
+
 // 生成一个n位(2进制)的随机数
 void RandomNumber(mpz_t c, int n)
 {
-  gmp_randstate_t state;
-  gmp_randinit_default(state);
-
-  mp_bitcnt_t v;
-  v = n;
-  mpz_rrandomb(c, state, v);
+  mpz_rrandomb(c, state, n);
+  mpz_nextprime(c, c);
 }
 
 // 检查p, q的距离是否符合要求
@@ -87,6 +85,8 @@ void PhiN(mpz_t phi, mpz_t p, mpz_t q)
 void ProduceKey(int k, mpz_t n, mpz_t e, mpz_t d)
 {
 
+  gmp_randinit_default(state);
+  gmp_randseed_ui(state, time(NULL));
   while (1)
   {
     mpz_t temp_p;
@@ -96,8 +96,8 @@ void ProduceKey(int k, mpz_t n, mpz_t e, mpz_t d)
     mpz_t temp_n;
     mpz_init(temp_n);
 
-    RandomNumber(temp_p, (k + 1) / 2);
-    RandomNumber(temp_q, (k - 1) / 2);
+    RandomNumber(temp_p, k / 2);
+    RandomNumber(temp_q, k / 2);
     PhiN(temp_n, temp_p, temp_q);
 
     if (PQCheck(temp_p, temp_q, k) && IsKbit(temp_n, k))
@@ -114,5 +114,9 @@ void ProduceKey(int k, mpz_t n, mpz_t e, mpz_t d)
     mpz_clear(temp_q);
   }
 
+  // 公钥e固定为65537
   mpz_set_ui(e, 65537);
+
+  // 用逆元求d
+  mpz_invert(d, e, n);
 }
