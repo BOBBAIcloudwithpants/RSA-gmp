@@ -53,4 +53,6 @@ int Octet_ValSize(mpz_t val);
 // 将用16进制表示的密钥转换为大整数
 void Octet_ConvertKeyToInt(const char *key, mpz_t m);
 
+void Octet_printHex(OctetString *oc);
+
 #endif

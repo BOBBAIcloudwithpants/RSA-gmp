@@ -3,6 +3,8 @@
 
 #include "gmp.h"
 #include "Int.h"
+#include "Rsa.h"
+#include "OctetString.h"
 #include <stdlib.h>
 
 // 生成一个n位(2进制)的随机数
@@ -19,5 +21,7 @@ void PhiN(mpz_t phi, mpz_t p, mpz_t q);
 
 // 产生公私钥，(e, n) 为公钥，(d, n) 为私钥, k为产生模数的位数
 void ProduceKey(int k, mpz_t n, mpz_t e, mpz_t d);
+
+void PrintKey(mpz_t key);
 
 #endif

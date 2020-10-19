@@ -82,13 +82,6 @@ void RSADP(mpz_t n, mpz_t c, mpz_t d, mpz_t m)
 void Encryption(mpz_t n, mpz_t e, OctetString *M, OctetString *C)
 {
   int k = Octet_ValSize(n);
-  printf("k: %d\n", k);
-
-  gmp_printf("n: %Zd\ne: %Zd\n", n, e);
-
-  printf("M: ");
-  Octet_print(M);
-  printf("%d\n", M->len);
   if (M->len > k - 11)
   {
     printf("Message too long\n");
@@ -97,8 +90,6 @@ void Encryption(mpz_t n, mpz_t e, OctetString *M, OctetString *C)
 
   OctetString *EM = Octet_init(k);
   EME_Encoding(M, k, EM);
-  printf("EM: ");
-  Octet_print(EM);
 
   mpz_t m;
   mpz_init(m);
@@ -108,7 +99,6 @@ void Encryption(mpz_t n, mpz_t e, OctetString *M, OctetString *C)
   Init_val(c, 0);
 
   OS2IP(EM, m);
-  gmp_printf("m: %Zd\n", m);
 
   if (Compare_mpz(m, n) > 0)
   {
@@ -120,14 +110,12 @@ void Encryption(mpz_t n, mpz_t e, OctetString *M, OctetString *C)
   }
 
   RSAEP(n, m, e, c);
-  gmp_printf("c: %Zd\nCypher: ", c);
 
   I2OSP(c, k, C);
-  Octet_print(C);
 
-  // mpz_clear(m);
-  // mpz_clear(c);
-  // Octet_free(EM);
+  mpz_clear(m);
+  mpz_clear(c);
+  Octet_free(EM);
 };
 
 int isValidEM(OctetString *EM)
@@ -161,9 +149,6 @@ void EME_decoding(OctetString *EM, OctetString *M, int ps_pos)
 
 void Decryption(mpz_t n, mpz_t d, OctetString *C, OctetString *M)
 {
-
-  printf("Decryption C-ken: %d\n", C->len);
-
   int k = Octet_ValSize(n);
   if (C->len != k)
   {
@@ -175,7 +160,6 @@ void Decryption(mpz_t n, mpz_t d, OctetString *C, OctetString *M)
   mpz_init(c);
   OS2IP(C, c);
 
-  gmp_printf("OS2IP->\nc: %Zd\n", c);
   mpz_t n_1;
   mpz_init(n_1);
   Minus_val(n_1, n, 1);
@@ -196,7 +180,6 @@ void Decryption(mpz_t n, mpz_t d, OctetString *C, OctetString *M)
   OctetString *EM = Octet_init(k);
   I2OSP(m, k, EM);
 
-  Octet_print(EM);
   int ps_pos = isValidEM(EM);
   if (!ps_pos)
   {

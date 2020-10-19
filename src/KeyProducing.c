@@ -105,3 +105,12 @@ void ProduceKey(int k, mpz_t n, mpz_t e, mpz_t d)
   // 用逆元求d
   mpz_invert(d, e, phiN);
 }
+
+void PrintKey(mpz_t key)
+{
+  int k = Octet_ValSize(key);
+  OctetString *octetKey = Octet_init(k);
+  I2OSP(key, k, octetKey);
+  Octet_printHex(octetKey);
+  Octet_free(octetKey);
+}

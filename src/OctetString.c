@@ -53,7 +53,7 @@ int Octet_size(OctetString *array)
 void Octet_print(OctetString *array)
 {
   printf("[ ");
-  for (int i = 0; i < Octet_size(array); i++)
+  for (int i = 0; i < array->len; i++)
   {
     printf("%d ", Octet_getValByIndex(array, i));
   }
@@ -153,7 +153,9 @@ void Octet_ConvertKeyToInt(const char *key, mpz_t a)
   while (i < len)
   {
     Product_val(a, a, 256);
-    Add_val(a, a, Octet_ConvertByteToInt(key[i], key[i + 1]));
+    unsigned char h = key[i];
+    unsigned char l = key[i + 1];
+    Add_val(a, a, Octet_ConvertByteToInt(h, l));
     i += 3;
   }
 };
@@ -164,19 +166,32 @@ OctetString *Octet_ConvertTextToOctets(char *text)
   OctetString *ret = Octet_init(len);
   for (int i = 0; i < len; i++)
   {
-    Octet_appendVal(ret, text[i]);
+    unsigned char t = text[i];
+    Octet_appendVal(ret, t);
   }
   return ret;
 }
 
 char *Octet_ConvertOctetsToText(OctetString *octets)
 {
-  char *ret = (char *)malloc(sizeof(char) * (octets->len + 1));
+  char *ret = (char *)malloc(sizeof(char) * (octets->len));
   int i = 0;
   for (i = 0; i < octets->len; i++)
   {
     ret[i] = octets->arr[i];
   }
-  ret[i] = '\0';
   return ret;
+}
+
+void Octet_printHex(OctetString *oc)
+{
+  for (int i = 0; i < oc->len; i++)
+  {
+    printf("%02x", Octet_getValByIndex(oc, i));
+    if (i < oc->len - 1)
+    {
+      printf(":");
+    }
+  }
+  printf("\n");
 }
