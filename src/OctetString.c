@@ -160,16 +160,13 @@ void Octet_ConvertKeyToInt(const char *key, mpz_t a)
   }
 };
 
-OctetString *Octet_ConvertTextToOctets(char *text)
+void Octet_ConvertTextToOctets(OctetString *ret, char *text, long long len)
 {
-  long long len = strlen(text);
-  OctetString *ret = Octet_init(len);
   for (int i = 0; i < len; i++)
   {
     unsigned char t = text[i];
     Octet_appendVal(ret, t);
   }
-  return ret;
 }
 
 char *Octet_ConvertOctetsToText(OctetString *octets)

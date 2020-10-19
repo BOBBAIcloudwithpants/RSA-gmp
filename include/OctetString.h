@@ -39,7 +39,7 @@ int Octet_getOctetlengthForInteger(mpz_t num);
 OctetString *Octet_generatePS(int length);
 
 // 将字符转换成 Octets 字节流
-OctetString *Octet_ConvertTextToOctets(char *text);
+void Octet_ConvertTextToOctets(OctetString *ret, char *text, long long len);
 
 // 将Octets字节流转换为字符串
 char *Octet_ConvertOctetsToText(OctetString *octets);

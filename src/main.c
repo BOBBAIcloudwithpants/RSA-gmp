@@ -1,7 +1,10 @@
 #include "OctetString.h"
+#include "Encryption.h"
 #include "Rsa.h"
 #include "KeyProducing.h"
 #include "Base64.h"
+
+index_t MAX_CHARACTER = 10000;
 int main()
 {
   mpz_t d, e, n;
@@ -12,30 +15,52 @@ int main()
 
   ProduceKey(1024, n, e, d);
 
-  char *text = "abasdfadfASFDFGajkdshflujdhlkjqwhtioe"; // 明文
-  OctetString *str = Octet_ConvertTextToOctets(text);   // 将明文转换为字节串的形式
-  printf("明文: ");
-  Octet_print(str);
-  printf("\n");
-  OctetString *C = Octet_init(Octet_ValSize(n)); // 密文
-  OctetString *M = Octet_init(strlen(text));     // 密文解密以后得到的结果
-
-  Encryption(n, e, str, C);
-
-  Decryption(n, d, C, M);
-
-  printf("n: ");
-  PrintKey(n);
-  printf("e: ");
-  PrintKey(e);
-  printf("d: ");
-  PrintKey(d);
-  Octet_print(M);
-
-  // char *out = Octet_ConvertOctetsToText(M);
-  // for (int i = 0; i < M->len; i++)
-  // {
-  //   printf("%c", out[i]);
-  // }
+  // char *text = "abasdfadfASFDFGajkdshflujdhlkjqwhtioe"; // 明文
+  // OctetString *str = Octet_ConvertTextToOctets(text);   // 将明文转换为字节串的形式
+  // printf("明文: ");
+  // Octet_print(str);
   // printf("\n");
+  // OctetString *C = Octet_init(Octet_ValSize(n)); // 密文
+  // OctetString *M = Octet_init(strlen(text));     // 密文解密以后得到的结果
+
+  // Encryption(n, e, str, C);
+
+  // Decryption(n, d, C, M);
+
+  // printf("n: ");
+  // PrintKey(n);
+  // printf("e: ");
+  // PrintKey(e);
+  // printf("d: ");
+  // PrintKey(d);
+  // Octet_print(M);
+
+  char text[MAX_CHARACTER];
+  printf("请输入明文，仅支持英文字母，英文符号和阿拉伯数字: ");
+  scanf("%s", text);
+  index_t len = strlen(text);
+  // 分段数量
+  int seg_num = (len % 117 == 0) ? len / 117 : len / 117 + 1;
+  index_t capacity = K / 8 * seg_num;
+
+  OctetString *cipher = Octet_init(capacity);
+  TextEncryption(text, cipher, e, n);
+  printf("加密后的密文的字节串: ");
+  Octet_print(cipher);
+  char output[capacity];
+  int size = CipherDecryption(cipher, output, d, n);
+
+  printf("模数n: ");
+  PrintKey(n);
+  printf("私钥e: ");
+  PrintKey(e);
+  printf("公钥d: ");
+  PrintKey(d);
+
+  printf("\n 经过加密再解密后的明文: ");
+  for (int i = 0; i < size; i++)
+  {
+    printf("%c", output[i]);
+  }
+  printf("\n");
 }
