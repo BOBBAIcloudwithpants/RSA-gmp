@@ -38,6 +38,7 @@ void TextEncryption(char *Text, OctetString *CipherText, mpz_t e, mpz_t n)
     // 初始化分段密文的长度
     OctetString *cipher = Octet_init(K / 8);
 
+    // 将这一组明文作为 RSA 的加密输入
     Encryption(n, e, octet_text, cipher);
 
     for (int j = 0; j < K / 8; j++)
@@ -66,14 +67,15 @@ index_t CipherDecryption(OctetString *CipherText, char *Output, mpz_t d, mpz_t n
   while (i < CipherText->len)
   {
     OctetString *c = Octet_init(K / 8);
-    for (int j = 0; j < 128; j++)
+    for (int j = 0; j < K / 8; j++)
     {
       Octet_appendVal(c, CipherText->arr[j + i]);
     }
 
     OctetString *m = Octet_init(K / 8);
     Decryption(n, d, c, m);
-    for (int j = 0; j < m->pos; j++)
+    int floor = min(m->pos, K / 8);
+    for (int j = 0; j < floor - 1; j++)
     {
       Output[idx++] = m->arr[j];
     }

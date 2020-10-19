@@ -1,3 +1,5 @@
+// RSA 加密，解密的主体部分
+
 #ifndef RSA_H
 #define RSA_H
 
@@ -20,16 +22,15 @@ void OS2IP(OctetString *EM, mpz_t m);
 void RSADP(mpz_t n, mpz_t d, mpz_t M, mpz_t c);
 
 // 判断EM是否符合格式，如果符合格式则返回 ps 的位置，否则返回0
-int isValidEM(OctetString * EM);
+int isValidEM(OctetString *EM);
 
 // 从EM中拿出M
 void EME_decoding(OctetString *EM, OctetString *M, int ps_pos);
 
-// (e, n) 为 接收者的 public key
+// (n, e) 为 public key，M为明文的字节串，C为密文的字节串
 void Encryption(mpz_t n, mpz_t e, OctetString *M, OctetString *C);
 
-// (n, d) 为接收者的私钥，C为密文
+// (n, d) 为 private key，C为密文, M为解密结果的字节串
 void Decryption(mpz_t n, mpz_t d, OctetString *C, OctetString *M);
-
 
 #endif

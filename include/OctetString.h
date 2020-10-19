@@ -1,3 +1,5 @@
+// 字节串定义以及相关的操作
+
 #ifndef OCTETSTRING_H
 #define OCTETSTRING_H
 
@@ -6,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-/*  Array 结构体的定义以及相关的方法  */
+/*  OctetString 结构体的定义以及相关的方法  */
 typedef struct
 {
   int *arr; // 数组指针
@@ -14,10 +16,10 @@ typedef struct
   int pos;  // 当前最后一个元素的位置
 } OctetString;
 
-// 根据给定的长度初始化一个 Array
+// 根据给定的长度初始化一个 OctetString
 OctetString *Octet_init(int len);
 
-// 反转 Array 中的 arr
+// 反转 Octet 中的 arr
 void Octet_reverse(OctetString *array);
 
 // 为 Octet 添加字节
@@ -53,6 +55,7 @@ int Octet_ValSize(mpz_t val);
 // 将用16进制表示的密钥转换为大整数
 void Octet_ConvertKeyToInt(const char *key, mpz_t m);
 
+// 将字节串用十六进制的形式打印
 void Octet_printHex(OctetString *oc);
 
 #endif

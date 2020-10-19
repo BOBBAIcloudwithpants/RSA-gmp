@@ -1,3 +1,5 @@
+// 公，私钥产生的函数
+
 #ifndef KEYPRODUCING_H
 #define KEYPRODUCING_H
 

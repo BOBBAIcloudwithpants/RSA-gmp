@@ -2,9 +2,8 @@
 #include "Encryption.h"
 #include "Rsa.h"
 #include "KeyProducing.h"
-#include "Base64.h"
 
-index_t MAX_CHARACTER = 10000;
+index_t MAX_CHARACTER = 100000;
 int main()
 {
   mpz_t d, e, n;
@@ -36,11 +35,11 @@ int main()
   // Octet_print(M);
 
   char text[MAX_CHARACTER];
-  printf("请输入明文，仅支持英文字母，英文符号和阿拉伯数字: ");
+  printf("请输入明文，为了保证最后的结果是可视字符，这里仅支持输入英文字母，英文符号和阿拉伯数字，最大长度为 100000: ");
   scanf("%s", text);
   index_t len = strlen(text);
   // 分段数量
-  int seg_num = (len % 117 == 0) ? len / 117 : len / 117 + 1;
+  int seg_num = (len % SegmentSize == 0) ? len / SegmentSize : len / SegmentSize + 1;
   index_t capacity = K / 8 * seg_num;
 
   OctetString *cipher = Octet_init(capacity);
@@ -52,12 +51,12 @@ int main()
 
   printf("模数n: ");
   PrintKey(n);
-  printf("私钥e: ");
+  printf("公钥e: ");
   PrintKey(e);
-  printf("公钥d: ");
+  printf("私钥d: ");
   PrintKey(d);
 
-  printf("\n 经过加密再解密后的明文: ");
+  printf("\n经过加密再解密后的明文: ");
   for (int i = 0; i < size; i++)
   {
     printf("%c", output[i]);

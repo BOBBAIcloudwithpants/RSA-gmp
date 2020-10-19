@@ -1,3 +1,5 @@
+// 对于较长明文的加密，解密
+
 #ifndef ENCRYPTION_H
 #define ENCRYPTION_H
 #include "Rsa.h"

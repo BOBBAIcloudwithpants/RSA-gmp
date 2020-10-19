@@ -1,6 +1,55 @@
 # RSA 设计报告
 
+## 运行环境
+- macOS 10.15.4
+
+## 运行方法
+进入项目根目录，打开终端，根据您的使用需求分别输入以下的命令:    
+1. 如果您想运行 `main` 函数，输入：
+```
+make
+```
+经过编译链接之后应该能在终端看到以下的字样:    
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gjv3xlyqswj31nw07wmzw.jpg)
+
+2. 如果您想运行 `test`，也就是算法的测试，输入:
+```
+make test
+```
+经过编译链接之后应该能在终端看到测试结果。(测试生成的可执行文件会在测试执行之后被删除)
+
+3. 如果您想清除所有的目标文件和可执行文件，输入：
+```
+make clean
+```
+
 ## 目录结构
+项目的目录结构如下:
+```
+.
+├── Makefile
+├── README.md
+├── gmp-build                     // gmp 库build后的目标文件的文件夹
+│   ├── include
+│   └── share
+├── include                       // RSA 算法所使用到的自定义的头文件目录
+│   ├── Encryption.h              // 加密，解密较长明文的函数定义
+│   ├── Int.h                     // 大整数运算的封装的函数定义
+│   ├── KeyProducing.h            // 生成公私钥的相关函数的定义
+│   ├── OctetString.h             // 字节串结构体定义和对字节串的操作的函数定义
+│   ├── Rsa.h                     // RSA 加密，解密的函数定义
+│   ├── Test.h                    // 测试用例的函数定义
+│   └── gmp.h                     // gmp库的头文件
+├── lib                           // gmp build结果的lib
+└── src                           // RSA 算法所使用到的所有方法的实现
+    ├── Encryption.c
+    ├── Int.c
+    ├── KeyProducing.c
+    ├── OctetString.c
+    ├── Rsa.c
+    ├── main.c
+    └── test.c
+```
 
 ## 数据结构设计
 RSA的加密，解密流程中主要涉及到两类结构: **大整数** 以及 **字节串**.      
@@ -105,24 +154,27 @@ int Octet_ValSize(mpz_t val);
 
 // 将用16进制表示的密钥转换为大整数
 void Octet_ConvertKeyToInt(const char *key, mpz_t m);
+
+// 将字节串用十六进制的形式打印
+void Octet_printHex(OctetString *oc);
 ```
 
 ## 密钥生成
 RSA 中的密钥有两种类型:    
-- 公钥: 用 **(n, d)** 来表示，其中 n 是模数，d 是一个整数。我在参考了 [openssl](https://www.openssl.org/) 的 RSA 公私钥产生以及蔡老师的课件之后，决定将 `d` 固定为十进制数 `65537`.    
-- 私钥: 用 **(n, e)** 来表示，其中 n 也是模数，与公钥中的n相同，e 也是一个整数。d 和 e具有这样的关系:
+- 公钥: 用 **(n, e)** 来表示，其中 n 是模数，e 是一个整数。我在参考了 [openssl](https://www.openssl.org/) 的 RSA 公私钥产生以及蔡老师的课件之后，决定将 `d` 固定为十进制数 `65537`.    
+- 私钥: 用 **(n, d)** 来表示，其中 n 也是模数，与公钥中的n相同，d 也是一个整数。d 和 e具有这样的关系:
 $$
 de\ \equiv\ 1 (mod \phi(N))
 $$
 
-可以看到，由于 d 为一个常数，则如何求解 `n` 是 RSA 密钥生成中的要点，求解 n 的算法流程如下:
+可以看到，由于 e 为一个常数，则如何求解 `n` 是 RSA 密钥生成中的要点，求解 n 的算法流程如下:
 
 1. 选定 n 在二进制形式下的位数 k，比如 256 位，512 位，1024 位等等
 2. 随机生成两个 `在二进制下的位数为 n/2` 的大整数 p，q
 3. 令 $N = p * q$, 判断 $N$ 的二进制形式下的位数是否等于 k。如果不等于，则返回`步骤2`
 4. 计算: $distance = log|p - q|$, 判断 $distance$ 是否处于 $(\frac{k}{2} - 100, \frac{k}{3})$ 这个范围内。如果不在，则返回`步骤2`。要注意的是，这一步是保证p, q的距离，以防p，q很容易被破解，如果不满足要求，并不会影响密钥的合法性，但会造成安全性的降低
-5. 令 $n = p * q, \phi(n) = (p - 1) * (q - 1), d = 65537$, 利用 $de\ \equiv\ 1 (mod \phi(N))$ 的性质来求解得到 e
-6. 至此，我们完成了公钥 (n, d) 和 私钥 (e, d) 的求解。
+5. 令 $n = p * q, \phi(n) = (p - 1) * (q - 1), e = 65537$, 利用 $de\ \equiv\ 1 (mod \phi(N))$ 的性质来求解得到 d
+6. 至此，我们完成了公钥 (n, e) 和 私钥 (n, d) 的求解。
 
 代码实现如下：
 ```c
@@ -346,7 +398,7 @@ void EME_decoding(OctetString *EM, OctetString *M, int ps_pos)
 在看过这些函数之后，终于到了加密的实现部分，加密算法的流程如下:    
 1. 对于明文的字节串进行 **EME填充**
 2. 通过 **OS2IP** 转换为整数
-3. 整数与私钥经过 **RSADP** 运算得到一串整数
+3. 整数与公钥经过 **RSADP** 运算得到一串整数
 4. 将这串整数通过 **I2OSP** 得到字节串
 5. 返回密文
 
@@ -397,7 +449,7 @@ void Encryption(mpz_t n, mpz_t e, OctetString *M, OctetString *C)
 ## 解密
 解密算法与加密算法用到的工具函数基本一致，解密算法的流程如下:     
 1. 将密文C的字节串通过 **OS2IP** 转为整数
-2. 将这个整数与公钥一起通过 **RSADP** 运算变成一串整数
+2. 将这个整数与私钥一起通过 **RSADP** 运算变成一串整数
 3. 将这串整数通过 **I2OSP** 变成字节串，此时的字节串应当与加密时的 EM 相同
 4. 将 EM 通过 **EME_decoding** 还原到明文
 5. 返回明文
@@ -457,6 +509,120 @@ void Decryption(mpz_t n, mpz_t d, OctetString *C, OctetString *M)
 }
 ```
 
+## 较长明文的加密，解密实现
+由于针对于不同的 **k**, RSA 仅能在一次加密最多 `k/1024 - 11` 个字节。所以在对于比较长的文本来说，要实现加密，需要将明文按照最大长度进行分段，并进行加密；类似的，在解密的时候也需要分段解密。      
+这里为了显示结果的直观，我在main函数中的输入明文部分限制 `英文字母，英文符号和阿拉伯数字`. 这是因为：针对一些 UTF-8 字符，比如中文字符等等，需要先将其转换成 `unsigned char` 再进行加密，最后的结果若用字符的形式输出会产生较多的不可见字符。实际在我的RSA算法实现中，各种字符都是支持的。    
+分段加密，解密的定义以及实现如下:
+```c
+index_t min(index_t a, index_t b)
+{
+  return a > b ? b : a;
+}
+
+void copy_segment(char *dst, char *src, index_t s, index_t e)
+{
+  for (int i = s; i < e; i++)
+  {
+    dst[i - s] = src[i];
+  }
+}
+
+// 长文本加密
+void TextEncryption(char *Text, OctetString *CipherText, mpz_t e, mpz_t n)
+{
+  // 明文长度
+  index_t len = strlen(Text);
+
+  // 分段数量
+  int seg_num = (len % 117 == 0) ? len / 117 : len / 117 + 1;
+
+  index_t i = 0;
+  while (i < len)
+  {
+    index_t floor = min(i + SegmentSize, len);
+
+    // 当前段的长度
+    int length = floor - i;
+    // 求出当前段内的内容
+    char *text = (char *)malloc(sizeof(char) * (floor - i));
+    copy_segment(text, Text, i, floor);
+    // 求出当前段的字节串形式
+    OctetString *octet_text = Octet_init(length);
+    Octet_ConvertTextToOctets(octet_text, text, length);
+
+    // 初始化分段密文的长度
+    OctetString *cipher = Octet_init(K / 8);
+
+    // 将这一组明文作为 RSA 的加密输入
+    Encryption(n, e, octet_text, cipher);
+
+    for (int j = 0; j < K / 8; j++)
+    {
+      Octet_appendVal(CipherText, Octet_getValByIndex(cipher, j));
+    }
+    if (len - i >= SegmentSize)
+    {
+      i += SegmentSize;
+    }
+    else
+    {
+      i = len;
+    }
+
+    Octet_free(cipher);
+    free(text);
+    Octet_free(octet_text);
+  }
+}
+
+// 长文本解密
+index_t CipherDecryption(OctetString *CipherText, char *Output, mpz_t d, mpz_t n)
+{
+  index_t i = 0;
+  index_t idx = 0;
+  while (i < CipherText->len)
+  {
+    OctetString *c = Octet_init(K / 8);
+    for (int j = 0; j < K / 8; j++)
+    {
+      Octet_appendVal(c, CipherText->arr[j + i]);
+    }
+
+    OctetString *m = Octet_init(K / 8);
+    Decryption(n, d, c, m);
+    int floor = min(m->pos, K / 8);
+    for (int j = 0; j < floor - 1; j++)
+    {
+      Output[idx++] = m->arr[j];
+    }
+    i += K / 8;
+  }
+  return idx;
+};
+```
+
+
+
+
 ## 测试
+本次RSA实验中我设计了 4 个测试样例，每个测试样例的测试内容如下:
+```c
+// 测试输入为长度较短的明文的情况
+void TestCase1();
+
+// 测试输入为长度较长的明文情况
+void TestCase2();
+
+// 测试出现长度异常的情况
+void TestCase3();
+
+// 测试出现UTF8字符也可以正常加密解密
+void TestCase4();
+```
+
+测试的结果如下图所示:     
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gjv3um9q1zj31gz0u0wxg.jpg)
+
+
 
 
