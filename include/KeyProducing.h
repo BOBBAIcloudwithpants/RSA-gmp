@@ -8,6 +8,7 @@
 #include "Rsa.h"
 #include "OctetString.h"
 #include <stdlib.h>
+#include "time.h"
 
 // 生成一个n位(2进制)的随机数
 void RandomNumber(mpz_t c, int n);
