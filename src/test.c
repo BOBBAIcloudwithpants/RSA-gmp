@@ -13,7 +13,7 @@ void TestCase1()
   ProduceKey(1024, n, e, d);
 
   printf("---------------- CASE 1 测试输入为长度较短的明文的情况 ---------------\n");
-  char *text = "abasdfadfASFDFGajkdshflujdhlkjqwhtioe"; // 明文
+  char *text = "abasdfadfASFDFGa@@!@#@!13534908609845903jkd, flujdhlkjqwhtioe"; // 明文
   OctetString *str = Octet_init(strlen(text));
   Octet_ConvertTextToOctets(str, text, strlen(text)); // 将明文转换为字节串的形式
   printf("明文:          ");
