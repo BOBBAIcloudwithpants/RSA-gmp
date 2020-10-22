@@ -12,11 +12,11 @@ ROOT:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 $(BIN_DIR)/main: $(BUILD_DIR)/main.o $(BUILD_DIR)/Int.o $(BUILD_DIR)/Rsa.o $(BUILD_DIR)/OctetString.o $(BUILD_DIR)/KeyProducing.o $(BUILD_DIR)/Encryption.o
 	@mkdir -p $(BIN_DIR)
-	$(CC) $(FLAGS) $(INCLUDE) $(LIB) $^ -o $@
+	$(CC) $(FLAGS) $(INCLUDE) $(LIB) $^ -o $@ -lgmp
 	./bin/main
 
 test: $(BUILD_DIR)/test.o $(BUILD_DIR)/Rsa.o $(BUILD_DIR)/KeyProducing.o $(BUILD_DIR)/Encryption.o $(BUILD_DIR)/OctetString.o $(BUILD_DIR)/Int.o
-	$(CC) $(FLAGS) $(INCLUDE) $(LIB) $^ -o $@
+	$(CC) $(FLAGS) $(INCLUDE) $(LIB) $^ -o $@ -lgmp
 	./test
 	@rm test
 
